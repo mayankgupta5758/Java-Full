@@ -1,0 +1,4 @@
+%LocalAppData%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets
+
+Overview of training JRE/ JDK difference Setting classpath Introduction to JAVA Programming JAVA first simple Program Program structure class diagram Installations(JDK , Eclipse, Notepad++)
+Basic naming conventions Class file and bytecode Features of Java Compiler and Interpreter Variables, Keywords, Datatypes, final keyword conditional statements- if, if-else, if-else ladder, switch Accepting Input from commandline arguments integrating eclipse and java API source code Scanner class Scanner class Control Structures Control Structures Iterative statements while, do-while, for, enhanced for Debugging, Call Stack Debugging, Call Stack

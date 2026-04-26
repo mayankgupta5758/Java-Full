@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Habit Tracker</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Inter, sans-serif;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* background video */
+
+    #bgVideo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      filter: brightness(0.5);
+    }
+
+    /* click overlay */
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    /* main app */
+
+    .app {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+
+      width: 90%;
+      max-width: 1800px;
+
+      background: rgba(255, 255, 255, .08);
+
+      backdrop-filter: blur(15px);
+
+      padding: 20px;
+
+      border-radius: 15px;
+
+      box-shadow: 0 20px 40px rgba(0, 0, 0, .5);
+
+    }
+
+    /* header */
+
+    .title {
+
+      font-size: 20px;
+
+      font-weight: 600;
+
+      margin-bottom: 10px;
+
+    }
+
+    .subtitle {
+
+      font-size: 11px;
+
+      opacity: .7;
+
+      margin-bottom: 10px;
+
+    }
+
+    /* input */
+
+    .controls {
+
+      display: flex;
+
+      justify-content: center;
+
+      gap: 10px;
+
+      margin-bottom: 15px;
+
+    }
+
+    .controls input {
+
+      width: 200px;
+
+      padding: 8px;
+
+      border: none;
+
+      border-radius: 8px;
+
+      font-size: 12px;
+
+    }
+
+    .controls button {
+
+      padding: 8px 12px;
+
+      border: none;
+
+      border-radius: 8px;
+
+      background: #6366f1;
+
+      color: white;
+
+      cursor: pointer;
+
+    }
+
+    /* table */
+
+    table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+    }
+
+    th {
+
+      font-size: 10px;
+
+      opacity: .7;
+
+    }
+
+    td {
+
+      padding: 4px;
+
+      text-align: center;
+
+    }
+
+    /* habit name */
+
+    .habitName {
+
+      text-align: left;
+
+      font-size: 12px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+    }
+
+    /* circle */
+
+    .cell {
+
+      width: 26px;
+
+      height: 26px;
+
+      border-radius: 50%;
+
+      background: rgba(255, 255, 255, .15);
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      cursor: pointer;
+
+      margin: auto;
+
+      transition: .2s;
+
+    }
+
+    .cell:hover {
+
+      transform: scale(1.15);
+
+    }
+
+    /* completed */
+
+    .done::after {
+
+      content: "✔";
+
+      font-size: 14px;
+
+    }
+
+    /* delete */
+
+    .delete {
+
+      cursor: pointer;
+
+      color: #ff4d4d;
+
+      margin-left: 8px;
+
+    }
+
+    .footer {
+
+      margin-top: 10px;
+
+      font-size: 11px;
+
+      opacity: .6;
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- overlay -->
+
+  <div id="overlay">Click to Start</div>
+
+  <!-- video -->
+
+  <video id="bgVideo" playsinline></video>
+
+  <div class="app">
+
+    <div class="card">
+
+      <div class="title">Habit Tracker</div>
+
+      <div class="subtitle">Build small habits daily</div>
+
+      <div class="controls">
+
+        <input id="habitInput" placeholder="Add habit">
+
+        <button onclick="addHabit()">Add</button>
+
+      </div>
+
+      <table id="tracker"></table>
+
+      <div class="footer">
+
+        Click circle to mark complete • ❌ to delete habit
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    /* ===========================
+    VIDEO SYSTEM
+    =========================== */
+
+    const videos = [
+      "video7.mp4"
+    ];
+
+    const video = document.getElementById("bgVideo");
+
+    const overlay = document.getElementById("overlay");
+
+    function randomVideo() {
+
+      const i = Math.floor(Math.random() * videos.length);
+
+      video.src = videos[i];
+
+      video.play();
+
+    }
+
+    /* next random video */
+
+    video.addEventListener("ended", randomVideo);
+
+    /* click start */
+
+    overlay.onclick = () => {
+
+      overlay.style.display = "none";
+
+      video.muted = false;
+
+      randomVideo();
+
+    };
+
+    /* ===========================
+    HABIT TRACKER
+    =========================== */
+
+    const DAYS = 31;
+
+    let habits = JSON.parse(localStorage.getItem("habits") || "[]");
+
+    let data = JSON.parse(localStorage.getItem("habitData") || "{}");
+
+    function save() {
+
+      localStorage.setItem("habits", JSON.stringify(habits));
+
+      localStorage.setItem("habitData", JSON.stringify(data));
+
+    }
+
+    function addHabit() {
+
+      const input = document.getElementById("habitInput");
+
+      if (!input.value) return;
+
+      habits.push(input.value);
+
+      input.value = "";
+
+      save();
+
+      render();
+
+    }
+
+    function toggle(habit, day) {
+
+      const key = habit + "_" + day;
+
+      if (data[key]) delete data[key];
+
+      else data[key] = 1;
+
+      save();
+
+      render();
+
+    }
+
+    function deleteHabit(habit) {
+
+      if (!confirm("Delete " + habit + " ?")) return;
+
+      habits = habits.filter(h => h !== habit);
+
+      for (let d = 1; d <= DAYS; d++) {
+
+        delete data[habit + "_" + d];
+
+      }
+
+      save();
+
+      render();
+
+    }
+
+    function render() {
+
+      const table = document.getElementById("tracker");
+
+      table.innerHTML = "";
+
+      let header = "<tr><th>Habit</th>";
+
+      for (let d = 1; d <= DAYS; d++)header += "<th>" + d + "</th>";
+
+      header += "</tr>";
+
+      table.innerHTML += header;
+
+      habits.forEach(h => {
+
+        let row = "<tr>";
+
+        row += `<td class="habitName">${h}
+<span class="delete" onclick="deleteHabit('${h}')">❌</span>
+</td>`;
+
+        for (let d = 1; d <= DAYS; d++) {
+
+          const key = h + "_" + d;
+
+          let cls = "cell";
+
+          if (data[key]) cls += " done";
+
+          row += `<td><div class="${cls}" onclick="toggle('${h}',${d})"></div></td>`;
+
+        }
+
+        row += "</tr>";
+
+        table.innerHTML += row;
+
+      });
+
+    }
+
+    document.getElementById("habitInput")
+
+      .addEventListener("keypress", e => {
+
+        if (e.key === "Enter") addHabit();
+
+      });
+
+    render();
+
+  </script>
+
+</body>
+
+</html>
